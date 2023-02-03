@@ -1,0 +1,299 @@
+---
+title: "Fitness Data Analysis"
+author: "Shahmir Zubair"
+date: "2023-02-02"
+output:
+  word_document: default
+  html_document: default
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+## Scenario
+
+You are a junior data analyst working on the marketing analyst team at
+Bellabeat, a high-tech manufacturer of health-focused products for
+women. Bellabeat is a successful small company, but they have the
+potential to become a larger player in the
+
+global smart device market. Urška Sršen, cofounder and Chief Creative
+Oﬃcer of Bellabeat, believes that analyzing smart device ﬁtness data
+could help unlock new growth opportunities for the company. You have
+been asked to focus on one of Bellabeat's products and analyze smart
+device data to gain insight into how consumers are using their smart
+devices. The insights you discover will then help guide marketing
+strategy for the company. You will present your analysis to the
+Bellabeat executive team along with your high-level recommendations for
+Bellabeat's marketing strategy.
+
+## Characters and products
+
+### ● Characters
+
+○ Urška Sršen: Bellabeat's cofounder and Chief Creative Oﬃcer
+
+○ Sando Mur: Mathematician and Bellabeat's cofounder; key member of the
+Bellabeat executive team
+
+○ Bellabeat marketing analytics team: A team of data analysts
+responsible for collecting, analyzing, and reporting data that helps
+guide Bellabeat's marketing strategy. You joined this team six months
+ago and have been busy learning about Bellabeat''s mission and business
+goals --- as well as how you, as a junior data analyst, can help
+Bellabeat achieve them.
+
+### ● Products
+
+○ Bellabeat app: The Bellabeat app provides users with health data
+related to their activity, sleep, stress, menstrual cycle, and
+mindfulness habits. This data can help users better understand their
+current habits and make healthy decisions. The Bellabeat app connects to
+their line of smart wellness products.
+
+○ Leaf: Bellabeat's classic wellness tracker can be worn as a bracelet,
+necklace, or clip. The Leaf tracker connects to the Bellabeat app to
+track activity, sleep, and stress.
+
+○ Time: This wellness watch combines the timeless look of a classic
+timepiece with smart technology to track user activity, sleep, and
+stress. The Time watch connects to the Bellabeat app to provide you with
+insights into your daily wellness.
+
+○ Spring: This is a water bottle that tracks daily water intake using
+smart technology to ensure that you are appropriately hydrated
+throughout the day. The Spring bottle connects to the Bellabeat app to
+track your hydration levels.
+
+○ Bellabeat membership: Bellabeat also oﬀers a subscription-based
+membership program for users. Membership gives users 24/7 access to
+fully personalized guidance on nutrition, activity, sleep, health and
+beauty, and mindfulness based on their lifestyle and goals.
+
+## About the company
+
+Urška Sršen and Sando Mur founded Bellabeat, a high-tech company that
+manufactures health-focused smart products. Sršen used her background as
+an artist to develop beautifully designed technology that informs and
+inspires women around the world. Collecting data on activity, sleep,
+stress, and reproductive health has allowed Bellabeat to empower women
+with knowledge about their own health and habits. Since it was founded
+in 2013, Bellabeat has grown rapidly and quickly positioned itself as a
+tech-driven wellness company for women.
+
+By 2016, Bellabeat had opened oﬃces around the world and launched
+multiple products. Bellabeat products became available through a growing
+number of online retailers in addition to their own e-commerce channel
+on their website. The company has invested in traditional advertising
+media, such as radio, out-of-home billboards, print, and television, but
+focuses on digital marketing extensively. Bellabeat invests year-round
+in Google Search, maintaining active Facebook and Instagram pages, and
+consistently engages consumers on Twitter. Additionally, Bellabeat runs
+video ads on Youtube and display ads on the Google Display Network to
+support campaigns around key marketing dates.
+
+Sršen knows that an analysis of Bellabeat's available consumer data
+would reveal more opportunities for growth. She has asked the marketing
+analytics team to focus on a Bellabeat product and analyze smart device
+usage data in order to gain insight into how people are already using
+their smart devices. Then, using this information, she would like
+high-level recommendations for how these trends can inform Bellabeat
+marketing strategy.
+
+## Ask
+
+Sršen asks you to analyze smart device usage data in order to gain
+insight into how consumers use non-Bellabeat smart devices. She then
+wants you to select one Bellabeat product to apply these insights to in
+your presentation. These questions will guide your analysis:
+
+1\. What are some trends in smart device usage?
+
+2\. How could these trends apply to Bellabeat customers?
+
+3\. How could these trends help inﬂuence Bellabeat marketing strategy?
+
+## Analysis
+
+First, we will install and load some important packages.
+
+```{r warning=FALSE, include=FALSE}
+# Loading packages
+library(tidyverse)
+library(ggplot2)
+```
+
+Reading all the necessary csv files into program
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+daily_activity <- read_csv('Data/dailyActivity_merged.csv')
+
+weight_log <- read_csv('Data/weightLogInfo_merged.csv')
+
+sleep_day <- read_csv('Data/sleepDay_merged.csv')
+```
+
+### Correlation between exercise and sedentary
+
+Data shows a clear trend between Total steps and sedentary minutes. It
+suggests that people who exercise more spend less time in sedentary as
+opposed to people who exercise less.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+
+ggplot(data=daily_activity, aes(x=TotalSteps, y=SedentaryMinutes)) +
+geom_point(color = "#004F98") +
+geom_smooth(method=lm)
+
+```
+
+### Correlation between exercise and calories burned
+
+Data also proves that more exercise leads to more calories burned.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+  
+ggplot(daily_activity, aes(TotalSteps, Calories)) +
+  geom_point(color = "#004F98") +
+  geom_smooth(method=lm)
+  
+```
+
+### Correlation between excercise and weight
+
+Grouping and summarizing the data.
+
+```{r message=TRUE, warning=FALSE}
+steps_vs_weight <- merge(daily_activity, weight_log) %>% 
+  group_by(Id) %>% 
+  summarize(steps = mean(TotalSteps), weight = mean(WeightKg))
+
+steps_vs_weight
+```
+
+There is a clear downwards trend between weight and steps. This suggests
+that people who exercise more tend to have less weight.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(steps_vs_weight, aes(steps,weight)) + 
+  geom_point(color="#004F98", size = 3) + 
+  geom_smooth(method = lm, level = 0.4, color = "#004F98")
+
+```
+
+### Correlation between very active people and sleep (No Relation found)
+
+Grouping and summarizing the data
+
+```{r}
+activity_vs_sleep <- merge(daily_activity, sleep_day) %>%
+  select(Id, VeryActiveMinutes, TotalMinutesAsleep) %>% 
+  group_by(Id) %>% 
+  summarize(very_active_minutes = mean(VeryActiveMinutes), total_minutes_asleep = mean(TotalMinutesAsleep))
+
+activity_vs_sleep
+```
+
+The plot suggests that sleep is not effected by being active in the day.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+ggplot(activity_vs_sleep, aes(very_active_minutes, total_minutes_asleep)) +
+  geom_point(color = "#004F98", size = 3) +
+  geom_smooth(method=lm)
+```
+
+### Correlation between VeryActiveMinutes vs day of the week
+
+Making a dayname column in daily_activity dataframe. Since ActivityDate
+is char datatype, first i will convert it into date.
+
+```{r}
+daily_activity$ActivityDate <- as.Date(daily_activity$ActivityDate,"%m/%d/%y")
+daily_activity$dayname <- weekdays(daily_activity$ActivityDate)
+```
+
+There is a clear downwards trend between being very active and day of
+the week. This may be due to high motivation levels at the start of the
+week which gradually go down as the week progresses.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(daily_activity, aes( x = fct_relevel(dayname, "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"), VeryActiveMinutes)) + 
+  geom_col(fill = "#004F98") + 
+  labs(x="DayName") 
+```
+
+### How many people are overweight? (using BMI)
+
+Creating a new dataframe for 8 people who submitted their weight
+information
+
+```{r}
+BMI <- weight_log %>% 
+  group_by(Id) %>% 
+  summarise(mean_BMI = mean(BMI, na.rm = TRUE))
+```
+
+Creating a column for their health condition based on BMI (Body Mass
+Index).
+
+***Note: BMI less than 25 is healthy. BMI between 25-25.9 is overweight
+and greater than 30 is obese***
+
+```{r}
+BMI <- BMI %>%  mutate(case_when(
+  mean_BMI < 25 ~ "Healthy",
+  mean_BMI >=25 & mean_BMI < 30 ~ "Overweight",
+  mean_BMI > 30 ~ "Obese"
+)) 
+colnames(BMI)[3] <- "health_condition"
+
+
+```
+
+Out of the 8 people only 3 are Healthy, 4 are overweight and only 1 is
+obese.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(BMI, aes(fct_relevel(health_condition, "Obese", "Overweight", "Healthy"))) +
+  geom_bar(fill = "#004F98") +
+  labs(title = "Condition of 8 people based on BMI",x = "Condition", y = "Number of people")
+```
+
+## Answering the buisness question
+
+1\. What are some trends in smart device usage?
+
+2\. How could these trends apply to Bellabeat customers?(I believe that
+displaying the trends would already indicate how Bellabeat customers
+would follow suit.)
+
+Based on insights generated by my analysis, i came to following
+hypothesis:
+
+1.  People spend more time engaged in physical activity on Sundays,
+    which proceeds to decrease throughout the week and rise again on
+    weekends. This may be due to motivation levels being higher on the
+    weekend and then as the week progresses, motivation levels decrease
+    as work load increases.
+
+Now the Final Question.
+
+3.  How could these trends help inﬂuence Bellabeat marketing strategy?
+
+1\. Bellabeat could host events limited to Bellabeat's members which
+reward users who engage in a healthy lifestyle(I.E 8 hours of sleep,8k
+steps a day, less than 7 hours sedentary etc.) with credits. With enough
+credits, users could then use credits to purchase Bellabeat's products
+that help supplement a healthy lifestyle.
+
+2\. Bellabeat could partner with brands (IE wellness, sports, health) to
+reward users who consistently engage in a healthy lifestyle with
+coupons/store discounts.
+
+3\. With the 2 previous points combined, Bellabeat could select
+previously unhealthy individuals (who are now healthy), interview them
+and publish motivational videos as to how Bellabeat encouraged them to
+have a change in lifestyle.
+
+## **Thank You!**
